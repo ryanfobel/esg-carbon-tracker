@@ -33,6 +33,34 @@ jobs:
           cache: 'npm'
           cache-dependency-path: esg-evidence/esg-evidence-new/package-lock.json
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate sample warehouse
+        run: |
+          pip install duckdb
+          cd esg-pipelines
+          python init_sample_warehouse.py
+          cd ..
+          # Create Evidence-compatible warehouse (tables in main schema)
+          python -c "
+          import duckdb
+          from pathlib import Path
+          import os
+
+          warehouse_src = Path.home() / '.paimon/esg_data/warehouse.duckdb'
+          warehouse_dst = Path('esg-evidence/esg-evidence-new/esg_data.duckdb')
+
+          conn = duckdb.connect(str(warehouse_dst))
+          conn.execute(f\"ATTACH '{warehouse_src}' AS original (READ_ONLY)\")
+          conn.execute('CREATE TABLE fact_cloud_carbon AS SELECT * FROM original.marts.fact_cloud_carbon')
+          conn.execute('CREATE TABLE fact_grid_intensity AS SELECT * FROM original.marts.fact_grid_intensity')
+          conn.execute('CREATE TABLE carbon_trends_monthly AS SELECT * FROM original.marts.carbon_trends_monthly')
+          conn.close()
+          "
+
       - name: Install Evidence
         working-directory: esg-evidence/esg-evidence-new
         run: npm ci

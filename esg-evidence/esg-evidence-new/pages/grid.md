@@ -11,8 +11,8 @@ SELECT
     fossil_fuel_percentage,
     renewable_percentage,
     data_source
-FROM marts.fact_grid_intensity
-WHERE timestamp_hour >= (SELECT MAX(timestamp_hour) - INTERVAL 1 DAY FROM marts.fact_grid_intensity)
+FROM fact_grid_intensity
+WHERE timestamp_hour >= (SELECT MAX(timestamp_hour) - INTERVAL 1 DAY fact_grid_intensity)
 ORDER BY carbon_intensity_gco2eq_per_kwh DESC
 ```
 
@@ -21,8 +21,8 @@ SELECT
     timestamp_hour,
     grid_region,
     carbon_intensity_gco2eq_per_kwh
-FROM marts.fact_grid_intensity
-WHERE timestamp_hour >= (SELECT MAX(timestamp_hour) - INTERVAL 7 DAY FROM marts.fact_grid_intensity)
+FROM fact_grid_intensity
+WHERE timestamp_hour >= (SELECT MAX(timestamp_hour) - INTERVAL 7 DAY fact_grid_intensity)
 ORDER BY timestamp_hour
 ```
 
@@ -31,8 +31,8 @@ SELECT
     intensity_category,
     COUNT(*) as count,
     AVG(carbon_intensity_gco2eq_per_kwh) as avg_intensity
-FROM marts.fact_grid_intensity
-WHERE timestamp_hour >= (SELECT MAX(timestamp_hour) - INTERVAL 7 DAY FROM marts.fact_grid_intensity)
+FROM fact_grid_intensity
+WHERE timestamp_hour >= (SELECT MAX(timestamp_hour) - INTERVAL 7 DAY fact_grid_intensity)
 GROUP BY intensity_category
 ORDER BY avg_intensity DESC
 ```
