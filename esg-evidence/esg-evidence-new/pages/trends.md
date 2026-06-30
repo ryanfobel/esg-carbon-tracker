@@ -15,7 +15,7 @@ SELECT
     scope1_percent,
     scope2_percent,
     scope3_percent
-FROM carbon_trends_monthly
+FROM esg_data.carbon_trends_monthly
 ORDER BY month DESC, cloud_provider
 LIMIT 100
 ```
@@ -25,7 +25,7 @@ SELECT
     month,
     cloud_provider,
     mom_change_percent
-FROM carbon_trends_monthly
+FROM esg_data.carbon_trends_monthly
 WHERE mom_change_percent IS NOT NULL
 ORDER BY month
 ```
@@ -35,7 +35,7 @@ SELECT
     month,
     cloud_provider,
     ytd_total_mtco2e
-FROM carbon_trends_monthly
+FROM esg_data.carbon_trends_monthly
 ORDER BY month
 ```
 

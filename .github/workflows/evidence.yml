@@ -38,10 +38,11 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Generate sample warehouse
+      - name: Generate sample data
         run: |
           pip install duckdb
           python esg-pipelines/init_evidence_warehouse.py
+          python esg-pipelines/export_to_csv.py
 
       - name: Install Evidence
         working-directory: esg-evidence/esg-evidence-new

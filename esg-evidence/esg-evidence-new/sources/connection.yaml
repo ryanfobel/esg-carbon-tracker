@@ -1,3 +1,0 @@
-name: esg_warehouse
-type: duckdb
-filename: esg_data.duckdb
