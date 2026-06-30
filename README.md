@@ -13,7 +13,7 @@ Open-source carbon emissions tracking and analytics for cloud infrastructure and
 
 ## Live Dashboard
 
-View the live dashboard at: [https://YOUR-USERNAME.github.io/esg-carbon-tracker/](https://YOUR-USERNAME.github.io/esg-carbon-tracker/)
+View the live dashboard at: [https://ryanfobel.github.io/esg-carbon-tracker/](https://ryanfobel.github.io/esg-carbon-tracker/)
 
 ## Quick Start
 
@@ -166,7 +166,7 @@ To enable:
 2. Set **Source** to "GitHub Actions"
 3. Push to main branch
 
-The dashboard will be live at `https://YOUR-USERNAME.github.io/esg-carbon-tracker/`
+The dashboard will be live at `https://ryanfobel.github.io/esg-carbon-tracker/`
 
 ## Data Models
 
@@ -227,5 +227,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Support
 
-- [Issues](https://github.com/YOUR-USERNAME/esg-carbon-tracker/issues)
-- [Discussions](https://github.com/YOUR-USERNAME/esg-carbon-tracker/discussions)
+- [Issues](https://github.com/ryanfobel/esg-carbon-tracker/issues)
+- [Discussions](https://github.com/ryanfobel/esg-carbon-tracker/discussions)

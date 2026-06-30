@@ -16,8 +16,8 @@ This guide will help you publish the ESG Carbon Tracker as a public repository o
 ```bash
 cd /Users/ryan/dev/esg-carbon-tracker
 
-# Add the remote (replace YOUR-USERNAME with your GitHub username)
-git remote add origin https://github.com/YOUR-USERNAME/esg-carbon-tracker.git
+# Add the remote (replace ryanfobel with your GitHub username)
+git remote add origin https://github.com/ryanfobel/esg-carbon-tracker.git
 
 # Push to main branch
 git push -u origin main
@@ -51,7 +51,7 @@ git push
 After the workflow completes (usually 2-3 minutes):
 
 1. Go to **Settings** → **Pages**
-2. You'll see: "Your site is live at https://YOUR-USERNAME.github.io/esg-carbon-tracker/"
+2. You'll see: "Your site is live at https://ryanfobel.github.io/esg-carbon-tracker/"
 3. Click the link to view your dashboard
 
 ## Step 6: Update README Links
@@ -61,9 +61,9 @@ Update the README with your actual GitHub username:
 ```bash
 cd /Users/ryan/dev/esg-carbon-tracker
 
-# Replace YOUR-USERNAME with your actual GitHub username in README.md
+# Replace ryanfobel with your actual GitHub username in README.md
 # You can do this manually or with:
-sed -i '' 's/YOUR-USERNAME/your-actual-username/g' README.md
+sed -i '' 's/ryanfobel/your-actual-username/g' README.md
 
 git add README.md
 git commit -m "Update README with actual GitHub username"
