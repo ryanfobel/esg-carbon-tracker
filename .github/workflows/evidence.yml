@@ -47,6 +47,10 @@ jobs:
         working-directory: esg-evidence/esg-evidence-new
         run: npm ci
 
+      - name: Extract data sources
+        working-directory: esg-evidence/esg-evidence-new
+        run: npm run sources
+
       - name: Build Evidence Dashboard
         working-directory: esg-evidence/esg-evidence-new
         run: npm run build
