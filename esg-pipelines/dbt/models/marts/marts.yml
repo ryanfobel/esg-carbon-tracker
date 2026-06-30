@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: fact_cloud_carbon
+    description: Unified cloud carbon emissions across all providers (GCP, AWS, Azure, CCF)
+    columns:
+      - name: id
+        description: Unique identifier
+        tests:
+          - unique
+          - not_null
+      - name: cloud_provider
+        description: Cloud provider (GCP, AWS, Azure)
+      - name: usage_month_start
+        description: First day of usage month
+      - name: total_kgco2e
+        description: Total emissions using market-based Scope 2 (kg CO2e)
+      - name: total_mtco2e
+        description: Total emissions in metric tons CO2e
+      - name: kgco2e_per_dollar
+        description: Carbon intensity per dollar spent
+      - name: kgco2e_per_kwh
+        description: Carbon intensity per kWh consumed
+
+  - name: fact_grid_intensity
+    description: Unified grid carbon intensity metrics from Electricity Maps and WattTime
+    columns:
+      - name: grid_region
+        description: Grid region or balancing authority
+      - name: timestamp_hour
+        description: Hourly timestamp
+      - name: carbon_intensity_kgco2eq_per_kwh
+        description: Grid carbon intensity (kg CO2eq/kWh)
+      - name: intensity_category
+        description: Categorical intensity (Very Low, Low, Medium, High, Very High)
+      - name: data_source
+        description: Source of data (Electricity Maps or WattTime)
+
+  - name: carbon_trends_monthly
+    description: Monthly carbon emissions trends with MoM changes and rolling averages
+    columns:
+      - name: month
+        description: Month (first day)
+      - name: cloud_provider
+        description: Cloud provider
+      - name: total_mtco2e
+        description: Total monthly emissions (metric tons CO2e)
+      - name: mom_change_percent
+        description: Month-over-month percent change
+      - name: rolling_3mo_avg_kgco2e
+        description: 3-month rolling average emissions
+      - name: ytd_total_kgco2e
+        description: Year-to-date cumulative emissions
+      - name: trend_indicator
+        description: Trend direction (Increasing, Decreasing, Stable, New Account)
+      - name: kgco2e_per_dollar
+        description: Carbon intensity per dollar spent

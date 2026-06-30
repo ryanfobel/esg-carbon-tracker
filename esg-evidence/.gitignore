@@ -1,0 +1,12 @@
+# Evidence.dev
+.evidence/
+.svelte-kit/
+build/
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local

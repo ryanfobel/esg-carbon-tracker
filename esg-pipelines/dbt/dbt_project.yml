@@ -1,0 +1,54 @@
+name: 'esg_pipelines'
+version: '1.0.0'
+config-version: 2
+
+# Profile configuration
+profile: 'esg_pipelines'
+
+# Paths
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Model configurations
+models:
+  esg_pipelines:
+    # Staging models - clean and normalize
+    staging:
+      +materialized: view
+      +schema: staging
+
+    # Mart models - business logic
+    marts:
+      +materialized: table
+      +schema: marts
+
+      carbon:
+        +tags: ['carbon', 'emissions']
+
+      grid:
+        +tags: ['grid', 'electricity']
+
+# Seeds
+seeds:
+  esg_pipelines:
+    +schema: seeds
+
+# Tests
+tests:
+  esg_pipelines:
+    +store_failures: true
+    +schema: test_results
+
+# Vars
+vars:
+  # Default warehouse path
+  warehouse_path: '~/.paimon/esg_data/warehouse.duckdb'

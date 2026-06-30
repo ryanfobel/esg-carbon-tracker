@@ -1,0 +1,14 @@
+esg_pipelines:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: '~/.paimon/esg_data/warehouse.duckdb'
+      schema: staging
+      threads: 4
+
+    prod:
+      type: duckdb
+      path: '~/.paimon/esg_data/warehouse.duckdb'
+      schema: marts
+      threads: 8

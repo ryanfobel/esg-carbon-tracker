@@ -1,0 +1,90 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Raw data from dlt pipelines
+    database: main
+    schema: raw
+
+    tables:
+      - name: gcp_carbon_footprint
+        description: GCP carbon emissions from BigQuery
+        columns:
+          - name: id
+            description: Primary key
+            tests:
+              - unique
+              - not_null
+          - name: usage_month
+            description: Month of cloud usage
+            tests:
+              - not_null
+          - name: total_kgco2e
+            description: Total carbon emissions in kg CO2e
+            tests:
+              - not_null
+
+      - name: aws_carbon_footprint
+        description: AWS carbon emissions from Sustainability API
+        columns:
+          - name: id
+            description: Primary key
+            tests:
+              - unique
+              - not_null
+          - name: usage_month
+            description: Month of cloud usage
+            tests:
+              - not_null
+
+      - name: azure_carbon_footprint
+        description: Azure carbon emissions from Emissions Impact Dashboard
+        columns:
+          - name: id
+            description: Primary key
+            tests:
+              - unique
+              - not_null
+          - name: usage_month
+            description: Month of cloud usage
+            tests:
+              - not_null
+
+      - name: ccf_carbon_footprint
+        description: Multi-cloud carbon emissions from Cloud Carbon Footprint
+        columns:
+          - name: id
+            description: Primary key
+            tests:
+              - unique
+              - not_null
+          - name: usage_date
+            description: Date of cloud usage
+            tests:
+              - not_null
+
+      - name: electricity_maps_carbon_intensity
+        description: Grid carbon intensity from Electricity Maps
+        columns:
+          - name: id
+            description: Primary key
+            tests:
+              - unique
+              - not_null
+          - name: timestamp
+            description: Timestamp of measurement
+            tests:
+              - not_null
+
+      - name: watttime_moer
+        description: Marginal operating emissions rate from WattTime
+        columns:
+          - name: id
+            description: Primary key
+            tests:
+              - unique
+              - not_null
+          - name: point_time
+            description: Timestamp of measurement
+            tests:
+              - not_null

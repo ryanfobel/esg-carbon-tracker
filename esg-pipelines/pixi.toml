@@ -1,0 +1,59 @@
+[workspace]
+name = "esg-pipelines"
+version = "1.0.0"
+description = "ESG data pipelines for multi-cloud carbon footprint tracking"
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "osx-64", "linux-64"]
+
+[dependencies]
+python = ">=3.11"
+pip = "*"
+
+# Data processing
+pandas = ">=2.0.0"
+pyarrow = ">=14.0.0"
+pyyaml = ">=6.0"
+duckdb = ">=0.10.0"
+requests = ">=2.31.0"
+python-dateutil = ">=2.8.0"
+
+# API service (available in conda-forge)
+fastapi = ">=0.109.0"
+uvicorn = ">=0.27.0"
+
+[pypi-dependencies]
+# Core pipeline framework (pip only)
+dlt = { version = ">=0.4.0", extras = ["duckdb"] }
+dbt-core = ">=1.7.0"
+dbt-duckdb = ">=1.7.0"
+
+# Cloud provider SDKs (pip only)
+google-cloud-bigquery = ">=3.11.0"
+google-auth = ">=2.23.0"
+boto3 = ">=1.28.0"
+azure-identity = ">=1.14.0"
+azure-mgmt-consumption = ">=10.0.0"
+
+# Additional pip packages
+pydantic = ">=2.0.0"
+python-multipart = ">=0.0.6"
+
+[tasks]
+# Run individual pipelines
+gcp = "python pipelines/gcp_carbon.py"
+aws = "python pipelines/aws_carbon.py"
+azure = "python pipelines/azure_carbon.py"
+ccf = "python pipelines/ccf_carbon.py"
+electricity-maps = "python pipelines/electricity_maps.py"
+watttime = "python pipelines/watttime.py"
+
+# Run dbt
+dbt-run = "dbt run --project-dir dbt --profiles-dir dbt"
+dbt-test = "dbt test --project-dir dbt --profiles-dir dbt"
+dbt-docs = "dbt docs generate --project-dir dbt --profiles-dir dbt"
+
+# Start API server
+api = "uvicorn api.main:app --reload --port 8000"
+
+# All pipelines (sample data mode)
+all-sample = { cmd = "python -c 'import sys; sys.path.insert(0, \".\"); from pipelines import gcp_carbon, aws_carbon, azure_carbon; print(\"Running sample pipelines...\"); gcp_carbon.run_pipeline(\"sample-project\"); aws_carbon.run_pipeline(); azure_carbon.run_pipeline()'", depends-on = [] }

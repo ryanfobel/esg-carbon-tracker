@@ -1,0 +1,11 @@
+{
+  "database": "duckdb",
+  "credentials": {
+    "filename": "~/.paimon/esg_data/warehouse.duckdb"
+  },
+  "layout": {
+    "headerColor": "#1e293b",
+    "logo": null,
+    "logoLink": "/"
+  }
+}

@@ -1,0 +1,47 @@
+# Azure Carbon Footprint Pipeline Configuration
+
+source: azure_carbon_footprint
+description: "Microsoft Azure carbon emissions data via Emissions Impact Dashboard"
+
+# Schedule
+schedule:
+  frequency: monthly  # Run monthly after Azure updates (15th of following month)
+  day_of_month: 16    # Run on 16th to ensure data is available
+  time: "02:00"       # 2 AM local time
+
+# Azure settings
+azure:
+  # subscription_id: optional, will use from environment if not specified
+  # Uses AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET
+
+# Incremental loading
+incremental:
+  enabled: true
+  lookback_months: 3  # Initial load: fetch last 3 months
+
+# Destination
+destination:
+  type: duckdb
+  warehouse_path: ~/.paimon/esg_data/warehouse.duckdb
+  schema: raw
+  table: azure_carbon_footprint
+
+# Data quality
+validation:
+  # Ensure scope totals are reasonable
+  max_scope1_kgco2e: 1000000  # 1,000 metric tons
+  max_scope2_kgco2e: 10000000  # 10,000 metric tons
+  max_scope3_kgco2e: 50000000  # 50,000 metric tons
+
+  # Ensure recent data exists
+  max_age_days: 90  # Alert if no data younger than 90 days
+
+# Alerts (future)
+alerts:
+  email: []  # Email addresses for pipeline failures
+  slack: null  # Slack webhook for notifications
+
+# Metadata
+version: 1.0
+created: 2026-06-29
+updated: 2026-06-29

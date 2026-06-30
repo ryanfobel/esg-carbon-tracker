@@ -1,0 +1,47 @@
+# AWS Carbon Footprint Pipeline Configuration
+
+source: aws_carbon_footprint
+description: "AWS carbon emissions data via Sustainability API"
+
+# Schedule
+schedule:
+  frequency: monthly  # Run monthly after AWS updates (21st of following month)
+  day_of_month: 22    # Run on 22nd to ensure data is available
+  time: "02:00"       # 2 AM local time
+
+# AWS settings
+aws:
+  region: us-east-1  # API region
+  # account_id: optional, will use from credentials if not specified
+
+# Incremental loading
+incremental:
+  enabled: true
+  lookback_months: 3  # Initial load: fetch last 3 months
+
+# Destination
+destination:
+  type: duckdb
+  warehouse_path: ~/.paimon/esg_data/warehouse.duckdb
+  schema: raw
+  table: aws_carbon_footprint
+
+# Data quality
+validation:
+  # Ensure scope totals are reasonable
+  max_scope1_kgco2e: 1000000  # 1,000 metric tons
+  max_scope2_kgco2e: 10000000  # 10,000 metric tons
+  max_scope3_kgco2e: 50000000  # 50,000 metric tons
+
+  # Ensure recent data exists
+  max_age_days: 90  # Alert if no data younger than 90 days
+
+# Alerts (future)
+alerts:
+  email: []  # Email addresses for pipeline failures
+  slack: null  # Slack webhook for notifications
+
+# Metadata
+version: 1.0
+created: 2026-06-29
+updated: 2026-06-29

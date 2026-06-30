@@ -1,0 +1,78 @@
+version: 2
+
+models:
+  - name: stg_gcp_carbon
+    description: Cleaned GCP carbon footprint data from BigQuery
+    columns:
+      - name: id
+        description: Unique identifier
+        tests:
+          - unique
+          - not_null
+      - name: cloud_provider
+        description: Cloud provider (always 'GCP')
+      - name: usage_month_start
+        description: First day of usage month
+      - name: total_market_based_kgco2e
+        description: Total emissions using market-based Scope 2
+
+  - name: stg_aws_carbon
+    description: Cleaned AWS carbon footprint data from Sustainability API
+    columns:
+      - name: id
+        description: Unique identifier
+        tests:
+          - unique
+          - not_null
+      - name: cloud_provider
+        description: Cloud provider (always 'AWS')
+
+  - name: stg_azure_carbon
+    description: Cleaned Azure carbon footprint data from Emissions Impact Dashboard
+    columns:
+      - name: id
+        description: Unique identifier
+        tests:
+          - unique
+          - not_null
+      - name: cloud_provider
+        description: Cloud provider (always 'Azure')
+
+  - name: stg_ccf_carbon
+    description: Cleaned multi-cloud carbon data from Cloud Carbon Footprint (aggregated to monthly)
+    columns:
+      - name: id
+        description: Unique identifier
+        tests:
+          - unique
+          - not_null
+      - name: total_kilowatt_hours
+        description: Total energy consumption (kWh)
+      - name: total_cost_usd
+        description: Total cloud spend (USD)
+
+  - name: stg_electricity_maps
+    description: Cleaned grid carbon intensity data from Electricity Maps
+    columns:
+      - name: id
+        description: Unique identifier
+        tests:
+          - unique
+          - not_null
+      - name: zone
+        description: Grid zone code (e.g., US-CA-CISO)
+      - name: carbon_intensity_kgco2eq_per_kwh
+        description: Carbon intensity in kg CO2eq per kWh
+
+  - name: stg_watttime
+    description: Cleaned MOER data from WattTime
+    columns:
+      - name: id
+        description: Unique identifier
+        tests:
+          - unique
+          - not_null
+      - name: ba
+        description: Balancing authority code
+      - name: moer_kgco2_per_kwh
+        description: Marginal operating emissions rate in kg CO2 per kWh

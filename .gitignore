@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Pixi
+.pixi/envs/
+pixi.lock
+
+# DuckDB
+*.duckdb
+*.duckdb.wal
+*.db
+*.db.wal
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn/
+
+# Evidence
+.evidence/
+*.parquet
+.routify/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+credentials.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# dbt
+dbt_packages/
+target/
+logs/
+
+# API
+.dlt/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+*.log

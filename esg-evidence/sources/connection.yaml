@@ -1,0 +1,3 @@
+name: esg_warehouse
+type: duckdb
+filename: ~/.paimon/esg_data/warehouse.duckdb

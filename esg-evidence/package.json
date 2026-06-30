@@ -1,0 +1,15 @@
+{
+  "name": "esg-evidence",
+  "version": "1.0.0",
+  "description": "Evidence.dev dashboard for ESG carbon footprint data",
+  "scripts": {
+    "dev": "evidence dev",
+    "build": "evidence build",
+    "build:strict": "evidence build:strict"
+  },
+  "dependencies": {
+    "@evidence-dev/evidence": "^40.0.0",
+    "@evidence-dev/duckdb": "^2.0.0"
+  },
+  "devDependencies": {}
+}
