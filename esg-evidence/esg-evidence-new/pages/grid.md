@@ -12,7 +12,7 @@ SELECT
     renewable_percentage,
     data_source
 FROM esg_data.fact_grid_intensity
-WHERE timestamp_hour >= (SELECT MAX(timestamp_hour) - INTERVAL 1 DAY fact_grid_intensity)
+WHERE timestamp_hour >= (SELECT MAX(timestamp_hour) - INTERVAL 1 DAY FROM esg_data.fact_grid_intensity)
 ORDER BY carbon_intensity_gco2eq_per_kwh DESC
 ```
 
