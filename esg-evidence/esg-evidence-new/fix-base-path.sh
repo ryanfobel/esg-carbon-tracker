@@ -8,11 +8,23 @@ BUILD_DIR="build"
 echo "Fixing absolute paths to include base path: $BASE_PATH"
 
 # Fix href and src attributes in HTML and JS files
-find "$BUILD_DIR" -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i '' \
-  -e "s|href=\"/\([^\"]*\)\"|href=\"$BASE_PATH/\1\"|g" \
-  -e "s|src=\"/\([^\"]*\)\"|src=\"$BASE_PATH/\1\"|g" \
-  -e "s|\"url\":\"/|\"url\":\"$BASE_PATH/|g" \
-  -e "s|data-url=\"/|data-url=\"$BASE_PATH/|g" \
-  {} +
+# Use sed syntax that works on both Linux and macOS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # macOS
+  find "$BUILD_DIR" -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i '' \
+    -e "s|href=\"/\([^\"]*\)\"|href=\"$BASE_PATH/\1\"|g" \
+    -e "s|src=\"/\([^\"]*\)\"|src=\"$BASE_PATH/\1\"|g" \
+    -e "s|\"url\":\"/|\"url\":\"$BASE_PATH/|g" \
+    -e "s|data-url=\"/|data-url=\"$BASE_PATH/|g" \
+    {} +
+else
+  # Linux
+  find "$BUILD_DIR" -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i \
+    -e "s|href=\"/\([^\"]*\)\"|href=\"$BASE_PATH/\1\"|g" \
+    -e "s|src=\"/\([^\"]*\)\"|src=\"$BASE_PATH/\1\"|g" \
+    -e "s|\"url\":\"/|\"url\":\"$BASE_PATH/|g" \
+    -e "s|data-url=\"/|data-url=\"$BASE_PATH/|g" \
+    {} +
+fi
 
 echo "Path fix complete!"
