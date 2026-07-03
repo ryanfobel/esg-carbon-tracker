@@ -59,7 +59,7 @@ theme:
       dark: "#f87171"
 
 deployment:
-  base: "/esg-carbon-tracker"
+  basePath: "/esg-carbon-tracker"
 
 plugins:
   components:

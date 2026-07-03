@@ -54,6 +54,8 @@ jobs:
 
       - name: Build Evidence Dashboard
         working-directory: esg-evidence/esg-evidence-new
+        env:
+          BASE_PATH: '/${{ github.event.repository.name }}'
         run: npm run build
 
       - name: Upload artifact
