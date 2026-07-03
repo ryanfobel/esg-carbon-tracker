@@ -58,9 +58,6 @@ theme:
       light: "#dc2626"
       dark: "#f87171"
 
-deployment:
-  basePath: "/esg-carbon-tracker"
-
 plugins:
   components:
     # This loads all of evidence's core charts and UI components

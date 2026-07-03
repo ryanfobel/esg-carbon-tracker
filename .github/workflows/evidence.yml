@@ -58,6 +58,12 @@ jobs:
           BASE_PATH: '/${{ github.event.repository.name }}'
         run: npm run build
 
+      - name: Fix base path in build
+        working-directory: esg-evidence/esg-evidence-new
+        run: |
+          chmod +x fix-base-path.sh
+          ./fix-base-path.sh
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
