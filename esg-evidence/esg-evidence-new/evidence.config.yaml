@@ -1,6 +1,3 @@
-deployment:
-  base_path: /esg-carbon-tracker
-
 appearance:
   default: system
   switcher: true
