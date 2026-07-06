@@ -1,2 +1,4 @@
 name: esg_data
-type: csv
+type: duckdb
+options:
+  filename: ../../esg_data.duckdb

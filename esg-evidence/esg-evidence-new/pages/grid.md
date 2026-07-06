@@ -76,7 +76,8 @@ ORDER BY avg_intensity DESC
     y={["fossil_fuel_percentage", "renewable_percentage"]}
     yAxisTitle="%"
     title="Current Fuel Mix by Region"
-    type=stacked100
+    type=stacked
+    swapXY=true
 />
 
 ## Current Readings
@@ -85,8 +86,8 @@ ORDER BY avg_intensity DESC
     <Column id=grid_region title="Region"/>
     <Column id=carbon_intensity_gco2eq_per_kwh title="Intensity (gCO2eq/kWh)" fmt="#,##0"/>
     <Column id=intensity_category title="Category"/>
-    <Column id=fossil_fuel_percentage title="Fossil Fuel %" fmt="#0.0%"/>
-    <Column id=renewable_percentage title="Renewable %" fmt="#0.0%"/>
+    <Column id=fossil_fuel_percentage title="Fossil Fuel %" fmt="#0.0"/>
+    <Column id=renewable_percentage title="Renewable %" fmt="#0.0"/>
     <Column id=data_source title="Source"/>
     <Column id=timestamp_hour title="Timestamp" fmt="yyyy-MM-dd HH:mm"/>
 </DataTable>

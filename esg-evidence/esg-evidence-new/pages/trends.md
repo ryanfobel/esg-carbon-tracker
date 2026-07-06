@@ -68,7 +68,7 @@ ORDER BY month
     <Column id=cloud_provider title="Provider"/>
     <Column id=account_id title="Account"/>
     <Column id=total_mtco2e title="Total (mtCO2e)" fmt="#,##0.00"/>
-    <Column id=mom_change_percent title="MoM Change" fmt="+#0.0%;-#0.0%"/>
+    <Column id=mom_change_percent title="MoM Change %" fmt="+#0.0;-#0.0"/>
     <Column id=trend_indicator title="Trend"/>
     <Column id=rolling_3mo_avg_mtco2e title="3Mo Avg" fmt="#,##0.00"/>
     <Column id=ytd_total_mtco2e title="YTD Total" fmt="#,##0.00"/>

@@ -1,0 +1,38 @@
+[workspace]
+name = "esg-carbon-tracker"
+version = "0.1.0"
+description = "ESG Carbon Footprint Dashboard - Cloud & Grid Carbon Intensity Tracking"
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64", "osx-64"]
+
+[dependencies]
+python = ">=3.11,<3.12"
+nodejs = "22.*"
+
+[pypi-dependencies]
+duckdb = ">=1.0,<2"
+dlt = { version = ">=1.8.0", extras = ["duckdb"] }
+dbt-duckdb = ">=1.8.0"
+boto3 = "*"
+google-cloud-billing = "*"
+azure-mgmt-consumption = "*"
+requests = "*"
+
+[tasks]
+# Generate sample warehouse data
+generate = "python esg-pipelines/init_evidence_warehouse.py"
+
+# Install Evidence npm dependencies
+install = "cd esg-evidence/esg-evidence-new && npm install --legacy-peer-deps"
+
+# Run Evidence dev server (depends on data being generated first)
+dev = { depends-on = ["generate"], cmd = "cd esg-evidence/esg-evidence-new && npm run dev" }
+
+# Extract data sources
+sources = { depends-on = ["generate"], cmd = "cd esg-evidence/esg-evidence-new && npm run sources" }
+
+# Build Evidence dashboard
+build = { depends-on = ["generate", "sources"], cmd = "cd esg-evidence/esg-evidence-new && npm run build" }
+
+# Preview built site
+preview = { depends-on = ["build"], cmd = "cd esg-evidence/esg-evidence-new && npm run preview" }

@@ -26,27 +26,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup pixi
+        uses: prefix-dev/setup-pixi@v0.8.1
         with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: esg-evidence/esg-evidence-new/package-lock.json
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+          pixi-version: v0.24.2
+          cache: true
 
       - name: Generate sample data
-        run: |
-          pip install duckdb
-          python esg-pipelines/init_evidence_warehouse.py
-          python esg-pipelines/export_to_csv.py
+        run: pixi run generate
 
       - name: Install Evidence
+        run: pixi run install
+
+      - name: Set base path for GitHub Pages
         working-directory: esg-evidence/esg-evidence-new
-        run: npm ci
+        run: |
+          printf '\ndeployment:\n  basePath: /%s\n' \
+            "${{ github.event.repository.name }}" >> evidence.config.yaml
 
       - name: Extract data sources
         working-directory: esg-evidence/esg-evidence-new
@@ -54,15 +50,7 @@ jobs:
 
       - name: Build Evidence Dashboard
         working-directory: esg-evidence/esg-evidence-new
-        env:
-          BASE_PATH: '/${{ github.event.repository.name }}'
         run: npm run build
-
-      - name: Fix base path in build
-        working-directory: esg-evidence/esg-evidence-new
-        run: |
-          chmod +x fix-base-path.sh
-          ./fix-base-path.sh
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
