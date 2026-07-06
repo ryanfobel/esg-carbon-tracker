@@ -20,19 +20,19 @@ requests = "*"
 
 [tasks]
 # Generate sample warehouse data
-generate = "python esg-pipelines/init_evidence_warehouse.py"
+generate = "python pipelines/init_evidence_warehouse.py"
 
 # Install Evidence npm dependencies
-install = "cd esg-evidence/esg-evidence-new && npm install --legacy-peer-deps"
+install = "cd dashboard && npm install --legacy-peer-deps"
 
 # Run Evidence dev server (depends on data being generated first)
-dev = { depends-on = ["generate"], cmd = "cd esg-evidence/esg-evidence-new && npm run dev" }
+dev = { depends-on = ["generate"], cmd = "cd dashboard && npm run dev" }
 
 # Extract data sources
-sources = { depends-on = ["generate"], cmd = "cd esg-evidence/esg-evidence-new && npm run sources" }
+sources = { depends-on = ["generate"], cmd = "cd dashboard && npm run sources" }
 
 # Build Evidence dashboard
-build = { depends-on = ["generate", "sources"], cmd = "cd esg-evidence/esg-evidence-new && npm run build" }
+build = { depends-on = ["generate", "sources"], cmd = "cd dashboard && npm run build" }
 
 # Preview built site
-preview = { depends-on = ["build"], cmd = "cd esg-evidence/esg-evidence-new && npm run preview" }
+preview = { depends-on = ["build"], cmd = "cd dashboard && npm run preview" }

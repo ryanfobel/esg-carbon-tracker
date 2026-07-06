@@ -8,8 +8,8 @@ from datetime import date, datetime, timedelta
 import random
 from pathlib import Path
 
-# Create warehouse in Evidence directory
-warehouse_path = Path(__file__).parent.parent / "esg-evidence/esg-evidence-new/esg_data.duckdb"
+# Create warehouse in dedicated warehouse directory
+warehouse_path = Path(__file__).parent.parent / "warehouse/esg_data.duckdb"
 warehouse_path.parent.mkdir(parents=True, exist_ok=True)
 
 conn = duckdb.connect(str(warehouse_path))

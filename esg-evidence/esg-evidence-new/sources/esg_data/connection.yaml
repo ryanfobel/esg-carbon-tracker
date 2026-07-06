@@ -1,4 +1,0 @@
-name: esg_data
-type: duckdb
-options:
-  filename: ../../esg_data.duckdb

@@ -1,4 +1,0 @@
-name: esg_warehouse
-type: duckdb
-filename: /Users/ryan/.paimon/esg_data/warehouse.duckdb
-schema: marts

@@ -1,0 +1,9 @@
+# Ignore all warehouse files
+*.duckdb
+*.duckdb.wal
+*.parquet
+*.db
+
+# Keep this directory structure
+!.gitignore
+!README.md

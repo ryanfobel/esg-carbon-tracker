@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'esg-evidence/esg-evidence-new/**'
-      - 'esg-pipelines/init_sample_warehouse.py'
+      - 'dashboard/**'
+      - 'pipelines/init_evidence_warehouse.py'
       - '.github/workflows/evidence.yml'
   workflow_dispatch:  # Allow manual trigger
 
@@ -39,23 +39,23 @@ jobs:
         run: pixi run install
 
       - name: Set base path for GitHub Pages
-        working-directory: esg-evidence/esg-evidence-new
+        working-directory: dashboard
         run: |
           printf '\ndeployment:\n  basePath: /%s\n' \
             "${{ github.event.repository.name }}" >> evidence.config.yaml
 
       - name: Extract data sources
-        working-directory: esg-evidence/esg-evidence-new
+        working-directory: dashboard
         run: npm run sources
 
       - name: Build Evidence Dashboard
-        working-directory: esg-evidence/esg-evidence-new
+        working-directory: dashboard
         run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: esg-evidence/esg-evidence-new/build
+          path: dashboard/build
 
   deploy:
     environment:
