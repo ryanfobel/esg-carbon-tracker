@@ -80,6 +80,38 @@ ORDER BY avg_intensity DESC
     swapXY=true
 />
 
+## Geographic Distribution
+
+```sql map_data
+SELECT
+    f.grid_region,
+    r.region_name,
+    r.city,
+    r.country,
+    r.cloud_providers,
+    AVG(f.carbon_intensity_gco2eq_per_kwh) as avg_intensity,
+    AVG(f.fossil_fuel_percentage) as avg_fossil,
+    AVG(f.renewable_percentage) as avg_renewable,
+    r.latitude as lat,
+    r.longitude as long
+FROM esg_data.fact_grid_intensity f
+JOIN main.dim_grid_regions r ON f.grid_region = r.grid_region
+WHERE f.timestamp_hour >= (SELECT MAX(timestamp_hour) - INTERVAL 1 DAY FROM esg_data.fact_grid_intensity)
+GROUP BY f.grid_region, r.region_name, r.city, r.country, r.cloud_providers, r.latitude, r.longitude
+```
+
+<BubbleMap
+    data={map_data}
+    lat=lat
+    long=long
+    size=avg_intensity
+    value=avg_intensity
+    valueFmt="#,##0"
+    pointName=grid_region
+    title="Carbon Intensity by Region"
+    height=400
+/>
+
 ## Current Readings
 
 <DataTable data={current_intensity}>
@@ -94,5 +126,5 @@ ORDER BY avg_intensity DESC
 
 ---
 
-**Data Sources**: Electricity Maps, WattTime
+**Data Sources**: [Electricity Maps](https://www.electricitymaps.com/), [WattTime](https://www.watttime.org/)
 **Update Frequency**: Hourly

@@ -97,5 +97,5 @@ FROM esg_data.fact_cloud_carbon
 
 ---
 
-**Data Sources**: GCP, AWS, Azure, Cloud Carbon Footprint
+**Data Sources**: [GCP Carbon Footprint](https://cloud.google.com/carbon-footprint), [AWS Customer Carbon Footprint Tool](https://aws.amazon.com/aws-cost-management/aws-customer-carbon-footprint-tool/), [Microsoft Cloud for Sustainability](https://www.microsoft.com/en-us/sustainability/cloud), [Cloud Carbon Footprint](https://www.cloudcarbonfootprint.org/)
 **Last Updated**: {new Date().toISOString().split('T')[0]}

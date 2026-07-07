@@ -1,201 +1,180 @@
 # ESG Carbon Tracker
 
-Open-source carbon emissions tracking and analytics for cloud infrastructure and grid electricity.
+Publication-quality carbon emissions tracking and analytics for cloud infrastructure and electrical grid intensity.
 
 ## Features
 
-- **Multi-Cloud Carbon Footprints**: Automated data pipelines for AWS, GCP, and Azure carbon emissions
-- **Grid Carbon Intensity**: Real-time and historical grid emissions data from WattTime and Electricity Maps
-- **Cloud Carbon Footprint (CCF)**: Integration with the open-source CCF tool
-- **Data Warehouse**: DuckDB-based analytical warehouse with dbt transformations
-- **REST API**: FastAPI service for querying carbon metrics
-- **Interactive Dashboard**: Evidence.dev dashboard for visualization and reporting
+- **Multi-Cloud Carbon Footprints**: Track emissions across AWS, GCP, and Azure with Scope 1/2/3 breakdown
+- **Global Grid Carbon Intensity**: Real-time and historical data for 51 regions across 6 continents
+- **Comprehensive Grid Mappings**: Dimension table linking electrical grid operators to cloud datacenter regions
+- **Interactive Visualizations**: Geographic maps, time-series trends, and detailed drill-down tables
+- **Documented Methodology**: Publication-quality documentation of data sources, calculations, and mappings
+- **Static Dashboard**: Fast, lightweight Evidence.dev dashboard deployable to GitHub Pages
 
 ## Live Dashboard
 
 View the live dashboard at: [https://ryanfobel.github.io/esg-carbon-tracker/](https://ryanfobel.github.io/esg-carbon-tracker/)
 
+## Methodology
+
+See [METHODOLOGY.md](METHODOLOGY.md) for comprehensive documentation of:
+- Data sources and update frequencies
+- Grid region to cloud datacenter mapping approach
+- Carbon intensity calculations and categorization
+- Quality standards and limitations
+- References and attribution
+
 ## Quick Start
 
-### 1. Generate Sample Data
+### Prerequisites
+
+- [Pixi](https://pixi.sh/) package manager (includes Python and Node.js)
+- Git
+
+### 1. Clone and Setup
 
 ```bash
-# Install dependencies
-cd esg-pipelines
+git clone https://github.com/ryanfobel/esg-carbon-tracker.git
+cd esg-carbon-tracker
 pixi install
-
-# Generate sample warehouse
-python init_sample_warehouse.py
 ```
 
-This creates a sample DuckDB warehouse at `~/.paimon/esg_data/warehouse.duckdb` with:
-- 6 months of multi-cloud carbon data
-- 7 days of grid intensity data
-- Pre-aggregated monthly trends
-
-### 2. View the Dashboard
+### 2. Generate Sample Data
 
 ```bash
-cd esg-evidence/esg-evidence-new
-npm install
-npm run dev
+pixi run generate
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
+This creates a sample DuckDB warehouse at `warehouse/esg_data.duckdb` with:
+- 6 months of multi-cloud carbon data across AWS, GCP, and Azure
+- 30 days of hourly grid intensity data for 51 global regions
+- Pre-calculated monthly trends with MoM changes and rolling averages
+- Comprehensive dimension table with grid operator to cloud region mappings
+
+### 3. View the Dashboard
+
+```bash
+pixi run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the interactive dashboard.
+
+### 4. Build for Production
+
+```bash
+pixi run build
+```
+
+The static site is generated in `dashboard/build/` and can be deployed to any static hosting service.
 
 ## Project Structure
 
 ```
 esg-carbon-tracker/
-├── esg-pipelines/           # Data ingestion and transformation
-│   ├── pipelines/           # dlt pipelines for data extraction
-│   │   ├── aws_carbon.py    # AWS Customer Carbon Footprint Tool
-│   │   ├── gcp_carbon.py    # GCP Carbon Footprint API
-│   │   ├── azure_carbon.py  # Azure Emissions API
-│   │   ├── ccf_carbon.py    # Cloud Carbon Footprint tool
-│   │   ├── watttime.py      # WattTime grid intensity
-│   │   └── electricity_maps.py  # Electricity Maps API
-│   ├── dbt/                 # Data transformations
-│   │   ├── models/staging/  # Raw data cleaning
-│   │   └── models/marts/    # Analytical models
-│   ├── api/                 # FastAPI REST service
-│   └── init_sample_warehouse.py  # Sample data generator
-├── esg-evidence/            # Evidence.dev dashboard
-│   └── esg-evidence-new/    # Dashboard source
-└── .github/workflows/       # CI/CD for GitHub Pages
+├── pipelines/                    # Data generation and ETL
+│   └── init_evidence_warehouse.py  # Sample data generator with comprehensive regional coverage
+├── dashboard/                    # Evidence.dev dashboard
+│   ├── pages/                    # Dashboard pages (index, grid, trends)
+│   ├── sources/                  # Data source configurations
+│   │   └── esg_data/
+│   │       └── connection.yaml   # DuckDB connection to warehouse
+│   ├── static/                   # Static assets
+│   └── package.json              # Node.js dependencies
+├── warehouse/                    # DuckDB analytical database (gitignored)
+│   ├── esg_data.duckdb          # Fact and dimension tables
+│   └── README.md                 # Data acquisition instructions
+├── pixi.toml                     # Pixi environment and task definitions
+├── METHODOLOGY.md                # Publication-quality methodology documentation
+└── .github/workflows/            # CI/CD for automated GitHub Pages deployment
+    └── evidence.yml              # Build and deploy workflow
 ```
 
-## Data Pipelines
+## Available Commands
 
-### Prerequisites
+All commands run via `pixi run <command>`:
 
-- Python 3.11+
-- [Pixi](https://pixi.sh/) package manager
-- Cloud provider credentials (for real data)
+- `generate` - Generate sample warehouse data with 51 global regions
+- `install` - Install dashboard dependencies (npm)
+- `dev` - Start development server with hot reload
+- `build` - Build static dashboard for production
+- `preview` - Preview production build locally
 
-### Running Pipelines
+## Dashboard Pages
 
-```bash
-cd esg-pipelines
+### Overview
+- Total emissions across all cloud providers
+- Monthly trend visualization
+- Emissions breakdown by scope (1, 2, 3)
+- Provider comparison bar charts
 
-# Run all pipelines
-pixi run all-pipelines
+### Grid Intensity
+- Real-time carbon intensity for 51 global regions
+- 7-day historical trends
+- Fuel mix analysis (fossil vs. renewable)
+- Interactive geographic bubble map
+- Detailed readings table with all metrics
 
-# Run individual pipelines
-pixi run pipeline-aws
-pixi run pipeline-gcp
-pixi run pipeline-azure
-pixi run pipeline-ccf
-pixi run pipeline-watttime
-pixi run pipeline-electricity-maps
+### Trends
+- Month-over-month percentage changes
+- 3-month rolling averages
+- Year-to-date cumulative totals
+- Trend indicators (increasing/decreasing/stable)
 
-# Run dbt transformations
-pixi run dbt-run
+## Data Schema
 
-# Start API server
-pixi run api
-```
+### Fact Tables
 
-### Authentication
+**fact_cloud_carbon**
+- Multi-cloud emissions data (AWS, GCP, Azure)
+- Scope 1, 2 (market-based), and 3 breakdowns
+- Service-level granularity (Compute, Storage, Networking, AI/ML)
+- Monthly aggregation with cost metrics (kgCO2e per dollar)
 
-Pipelines support multiple authentication methods:
+**fact_grid_intensity**
+- Hourly carbon intensity for 51 global regions
+- Measured in gCO2eq/kWh
+- Fuel mix percentages (fossil vs. renewable)
+- Intensity categorization (Very Low to Very High)
+- Data source attribution (Electricity Maps, WattTime)
 
-1. **Environment Variables**: Set credentials in your shell
-2. **Cloud SDK**: Use `gcloud`, `aws configure`, `az login`
-3. **Keystore**: Store credentials securely (see individual pipeline docs)
+**carbon_trends_monthly**
+- Pre-calculated monthly trends
+- Month-over-month percentage changes
+- 3-month rolling averages
+- Year-to-date cumulative totals
+- Trend indicators
 
-See [esg-pipelines/README.md](esg-pipelines/README.md) for detailed authentication instructions.
+### Dimension Tables
 
-## REST API
+**dim_grid_regions**
+- 51 global regions across 6 continents
+- Geographic coordinates (latitude/longitude)
+- Grid operator information (ISO/RTO)
+- Cloud provider region mappings (GCP, AWS, Azure)
+- Country and city metadata
 
-The FastAPI service provides endpoints for querying carbon metrics:
-
-```bash
-cd esg-pipelines
-pixi run api
-```
-
-### Endpoints
-
-- `GET /cloud-carbon` - Cloud provider emissions
-- `GET /cloud-carbon/trends` - Monthly trends
-- `GET /grid-intensity` - Grid carbon intensity
-- `GET /grid-intensity/latest` - Current grid intensity
-- `GET /export/json` - Export all data as JSON
-- `GET /export/csv` - Export as CSV
-- `GET /export/parquet` - Export as Parquet
-
-API documentation: [http://localhost:8000/docs](http://localhost:8000/docs)
-
-## Dashboard
-
-The Evidence.dev dashboard provides:
-
-- **Overview**: Total emissions, monthly trends, scope breakdowns
-- **Cloud Providers**: Emissions by provider, service, and region
-- **Grid Intensity**: Real-time and historical grid carbon intensity
-- **Trends**: Month-over-month changes, rolling averages, YTD totals
-
-### Local Development
-
-```bash
-cd esg-evidence/esg-evidence-new
-npm install
-npm run dev
-```
-
-### Production Build
-
-```bash
-npm run build
-```
-
-The static site is generated in `build/` and can be deployed anywhere.
+See [METHODOLOGY.md](METHODOLOGY.md) for detailed mapping approach and data quality standards.
 
 ## GitHub Pages Deployment
 
-The repository includes a GitHub Actions workflow that automatically:
+The repository includes a GitHub Actions workflow (`.github/workflows/evidence.yml`) that automatically:
 
-1. Generates sample warehouse data
-2. Builds the Evidence dashboard
-3. Deploys to GitHub Pages
+1. Sets up Pixi environment with Python and Node.js
+2. Generates sample warehouse data
+3. Installs dashboard dependencies
+4. Builds static Evidence dashboard
+5. Deploys to GitHub Pages
 
-To enable:
+**To enable:**
 
 1. Go to **Settings → Pages**
 2. Set **Source** to "GitHub Actions"
-3. Push to main branch
+3. Push changes to main branch
+4. Workflow runs automatically on pushes to `dashboard/` or `pipelines/`
 
-The dashboard will be live at `https://ryanfobel.github.io/esg-carbon-tracker/`
+The dashboard will be live at: `https://<username>.github.io/esg-carbon-tracker/`
 
-## Data Models
-
-### Raw Layer
-
-Direct extraction from source APIs:
-- `raw.aws_carbon_footprint`
-- `raw.gcp_carbon_footprint`
-- `raw.azure_emissions`
-- `raw.ccf_emissions`
-- `raw.watttime_moer`
-- `raw.electricity_maps_carbon_intensity`
-
-### Staging Layer
-
-Cleaned and normalized data:
-- `staging.stg_aws_carbon`
-- `staging.stg_gcp_carbon`
-- `staging.stg_azure_carbon`
-- `staging.stg_ccf_carbon`
-- `staging.stg_watttime`
-- `staging.stg_electricity_maps`
-
-### Marts Layer
-
-Analytical models:
-- `marts.fact_cloud_carbon` - Unified cloud emissions across all providers
-- `marts.fact_grid_intensity` - Grid carbon intensity metrics
-- `marts.carbon_trends_monthly` - Aggregated monthly trends
+**Note**: The workflow uses a relative database path (`../../../warehouse/esg_data.duckdb`) and references dimension tables with the `main.` schema prefix for compatibility with Evidence's DuckDB connector.
 
 ## Contributing
 
