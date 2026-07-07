@@ -95,7 +95,7 @@ SELECT
     r.latitude as lat,
     r.longitude as long
 FROM esg_data.fact_grid_intensity f
-JOIN main.dim_grid_regions r ON f.grid_region = r.grid_region
+JOIN esg_data.dim_grid_regions r ON f.grid_region = r.grid_region
 WHERE f.timestamp_hour >= (SELECT MAX(timestamp_hour) - INTERVAL 1 DAY FROM esg_data.fact_grid_intensity)
 GROUP BY f.grid_region, r.region_name, r.city, r.country, r.cloud_providers, r.latitude, r.longitude
 ```
@@ -125,8 +125,8 @@ SELECT
     d.avg_intensity,
     d.avg_fossil_percentage,
     d.avg_renewable_percentage
-FROM main.grid_intensity_daily d
-JOIN main.dim_grid_regions r ON d.grid_region = r.grid_region
+FROM esg_data.grid_intensity_daily d
+JOIN esg_data.dim_grid_regions r ON d.grid_region = r.grid_region
 WHERE d.date >= CURRENT_DATE - INTERVAL 7 DAYS
 ORDER BY d.date DESC, d.avg_intensity DESC
 ```
@@ -152,8 +152,8 @@ SELECT
     AVG(d.avg_renewable_percentage) as avg_renewable,
     MIN(d.avg_intensity) as min_intensity,
     MAX(d.avg_intensity) as max_intensity
-FROM main.grid_intensity_daily d
-JOIN main.dim_grid_regions r ON d.grid_region = r.grid_region
+FROM esg_data.grid_intensity_daily d
+JOIN esg_data.dim_grid_regions r ON d.grid_region = r.grid_region
 WHERE d.date >= CURRENT_DATE - INTERVAL 7 DAYS
 GROUP BY d.grid_region, r.region_name, r.country
 ORDER BY avg_intensity ASC
@@ -180,8 +180,8 @@ SELECT
     m.avg_intensity,
     m.avg_fossil_percentage,
     m.avg_renewable_percentage
-FROM main.grid_intensity_monthly m
-JOIN main.dim_grid_regions r ON m.grid_region = r.grid_region
+FROM esg_data.grid_intensity_monthly m
+JOIN esg_data.dim_grid_regions r ON m.grid_region = r.grid_region
 ORDER BY m.month_start DESC, m.avg_intensity
 ```
 
