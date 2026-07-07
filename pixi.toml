@@ -17,6 +17,7 @@ boto3 = "*"
 google-cloud-billing = "*"
 azure-mgmt-consumption = "*"
 requests = "*"
+keyring = "*"
 
 [tasks]
 # Generate sample warehouse data
