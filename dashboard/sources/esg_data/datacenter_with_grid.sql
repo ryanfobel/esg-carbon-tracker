@@ -1,4 +1,5 @@
 -- Join cloud emissions with grid region data and calculate average grid intensity
+-- Maps datacenters to grid regions using the updated dim_grid_regions table
 WITH cloud_regions AS (
     SELECT
         cloud_provider,
@@ -11,12 +12,12 @@ WITH cloud_regions AS (
 grid_intensity_avg AS (
     SELECT
         grid_region,
-        AVG(avg_intensity) as avg_carbon_intensity,
+        AVG(avg_carbon_intensity) as avg_carbon_intensity,
         CASE
-            WHEN AVG(avg_intensity) < 100 THEN 'Very Low'
-            WHEN AVG(avg_intensity) < 250 THEN 'Low'
-            WHEN AVG(avg_intensity) < 400 THEN 'Medium'
-            WHEN AVG(avg_intensity) < 600 THEN 'High'
+            WHEN AVG(avg_carbon_intensity) < 100 THEN 'Very Low'
+            WHEN AVG(avg_carbon_intensity) < 250 THEN 'Low'
+            WHEN AVG(avg_carbon_intensity) < 400 THEN 'Medium'
+            WHEN AVG(avg_carbon_intensity) < 600 THEN 'High'
             ELSE 'Very High'
         END as cleanliness_category
     FROM grid_intensity_daily
