@@ -1,5 +1,6 @@
 -- Join cloud emissions with grid region data and calculate average grid intensity
 -- Maps datacenters to grid regions using the updated dim_grid_regions table
+-- Now includes 14 cloud regions with emissions data (CA-QC, SG, and more)
 WITH cloud_regions AS (
     SELECT
         cloud_provider,

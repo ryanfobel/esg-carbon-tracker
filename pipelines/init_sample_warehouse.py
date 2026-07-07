@@ -9,23 +9,18 @@ from datetime import date, datetime, timedelta
 import random
 
 # Create warehouse
-warehouse_path = Path("~/.paimon/esg_data/warehouse.duckdb").expanduser()
+warehouse_path = Path(__file__).parent.parent / "warehouse/esg_data.duckdb"
 warehouse_path.parent.mkdir(parents=True, exist_ok=True)
 
 conn = duckdb.connect(str(warehouse_path))
 
-# Create schemas
-conn.execute("CREATE SCHEMA IF NOT EXISTS raw")
-conn.execute("CREATE SCHEMA IF NOT EXISTS staging")
-conn.execute("CREATE SCHEMA IF NOT EXISTS marts")
-
 print("Creating sample ESG data...")
 
 # fact_cloud_carbon
-print("  - marts.fact_cloud_carbon")
-conn.execute("DROP TABLE IF EXISTS marts.fact_cloud_carbon")
+print("  - fact_cloud_carbon")
+conn.execute("DROP TABLE IF EXISTS fact_cloud_carbon")
 conn.execute("""
-    CREATE TABLE marts.fact_cloud_carbon (
+    CREATE TABLE fact_cloud_carbon (
         id VARCHAR,
         cloud_provider VARCHAR,
         account_id VARCHAR,
@@ -51,9 +46,9 @@ services = {
     'Azure': ['Virtual Machines', 'Blob Storage', 'SQL Database']
 }
 regions = {
-    'GCP': ['us-central1', 'europe-west1'],
-    'AWS': ['us-east-1', 'eu-west-1'],
-    'Azure': ['eastus', 'westeurope']
+    'GCP': ['us-central1', 'europe-west1', 'northamerica-northeast1', 'asia-southeast1'],
+    'AWS': ['us-east-1', 'eu-west-1', 'ca-central-1', 'ap-southeast-1', 'us-west-2'],
+    'Azure': ['eastus', 'westeurope', 'canadacentral', 'southeastasia', 'uksouth']
 }
 
 for i in range(6):
@@ -68,7 +63,7 @@ for i in range(6):
                 total = scope1 + scope2 + scope3
 
                 conn.execute("""
-                    INSERT INTO marts.fact_cloud_carbon VALUES (
+                    INSERT INTO fact_cloud_carbon VALUES (
                         ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                     )
                 """, [
@@ -89,10 +84,10 @@ for i in range(6):
                 ])
 
 # fact_grid_intensity
-print("  - marts.fact_grid_intensity")
-conn.execute("DROP TABLE IF EXISTS marts.fact_grid_intensity")
+print("  - fact_grid_intensity")
+conn.execute("DROP TABLE IF EXISTS fact_grid_intensity")
 conn.execute("""
-    CREATE TABLE marts.fact_grid_intensity (
+    CREATE TABLE fact_grid_intensity (
         grid_region VARCHAR,
         timestamp_hour TIMESTAMP,
         timestamp_day DATE,
@@ -106,7 +101,7 @@ conn.execute("""
 """)
 
 # Generate 7 days of grid data
-zones = ['US-CA-CISO', 'US-PJM', 'GB', 'DE']
+zones = ['US-CA-CISO', 'US-VA-PJM', 'US-IA-MISO', 'CA-QC', 'CA-ON', 'GB', 'DE', 'NL', 'IE', 'SG']
 for i in range(7 * 24):
     timestamp = datetime.now() - timedelta(hours=i)
 
@@ -116,7 +111,7 @@ for i in range(7 * 24):
         renewable = random.uniform(20, 50)
 
         conn.execute("""
-            INSERT INTO marts.fact_grid_intensity VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO fact_grid_intensity VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, [
             zone,
             timestamp,
@@ -130,10 +125,10 @@ for i in range(7 * 24):
         ])
 
 # carbon_trends_monthly
-print("  - marts.carbon_trends_monthly")
-conn.execute("DROP TABLE IF EXISTS marts.carbon_trends_monthly")
+print("  - carbon_trends_monthly")
+conn.execute("DROP TABLE IF EXISTS carbon_trends_monthly")
 conn.execute("""
-    CREATE TABLE marts.carbon_trends_monthly (
+    CREATE TABLE carbon_trends_monthly (
         month DATE,
         cloud_provider VARCHAR,
         account_id VARCHAR,
@@ -159,7 +154,7 @@ for i in range(6):
         mom = ((total - prev) / prev * 100) if i > 0 else None
 
         conn.execute("""
-            INSERT INTO marts.carbon_trends_monthly VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO carbon_trends_monthly VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, [
             month,
             provider,
