@@ -4,9 +4,12 @@
   "type": "module",
   "scripts": {
     "dev": "evidence dev",
+    "dev:safe": "cd ../pipelines && python validate_schema.py && cd ../dashboard && evidence dev",
     "build": "evidence build",
+    "build:safe": "cd ../pipelines && python validate_schema.py && cd ../dashboard && evidence build",
     "sources": "evidence sources",
-    "preview": "evidence preview"
+    "preview": "evidence preview",
+    "validate": "cd ../pipelines && python validate_schema.py"
   },
   "dependencies": {
     "@evidence-dev/evidence": "^40.0.0",

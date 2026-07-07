@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: grid_intensity_daily
+    description: Daily aggregation of grid carbon intensity with peak/off-peak analysis
+    columns:
+      - name: grid_region
+        description: Grid region or balancing authority
+        tests:
+          - not_null
+      - name: timestamp_day
+        description: Date (daily grain)
+        tests:
+          - not_null
+      - name: avg_carbon_intensity
+        description: Average daily carbon intensity (gCO2eq/kWh)
+        tests:
+          - not_null
+      - name: distinct_hours
+        description: Number of distinct hours with data
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.expression_is_true:
+          expression: "avg_carbon_intensity >= 0"
+      - dbt_utils.expression_is_true:
+          expression: "distinct_hours <= 24"
+
+  - name: dim_grid_regions
+    description: Dimension table with metadata for grid regions
+    columns:
+      - name: grid_region
+        description: Grid region code
+        tests:
+          - unique
+          - not_null
+      - name: region_name
+        description: Human-readable region name
+      - name: country
+        description: Country of the grid region
