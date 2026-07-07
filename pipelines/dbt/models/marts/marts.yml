@@ -55,3 +55,60 @@ models:
         description: Trend direction (Increasing, Decreasing, Stable, New Account)
       - name: kgco2e_per_dollar
         description: Carbon intensity per dollar spent
+
+  - name: grid_intensity_daily
+    description: Daily aggregation of grid carbon intensity with peak/off-peak analysis
+    columns:
+      - name: grid_region
+        description: Grid region or balancing authority
+      - name: timestamp_day
+        description: Date (daily grain)
+      - name: avg_carbon_intensity
+        description: Average daily carbon intensity (gCO2eq/kWh)
+      - name: min_carbon_intensity
+        description: Minimum hourly intensity during the day
+      - name: max_carbon_intensity
+        description: Maximum hourly intensity during the day
+      - name: daily_range
+        description: Difference between max and min intensity
+      - name: avg_intensity_category
+        description: Category based on average intensity (Very Low to Very High)
+      - name: low_carbon_hours
+        description: Number of hours with intensity < 250 gCO2eq/kWh
+      - name: high_carbon_hours
+        description: Number of hours with intensity >= 600 gCO2eq/kWh
+      - name: avg_peak_intensity
+        description: Average intensity during peak hours (7am-11pm)
+      - name: avg_offpeak_intensity
+        description: Average intensity during off-peak hours
+      - name: is_complete_day
+        description: True if 20+ hours of data available
+
+  - name: dim_grid_regions
+    description: Dimension table with metadata for grid regions and balancing authorities
+    columns:
+      - name: grid_region
+        description: Grid region code
+        tests:
+          - unique
+          - not_null
+      - name: region_name
+        description: Human-readable region name
+      - name: country
+        description: Country of the grid region
+      - name: continent
+        description: Continent (North America, Europe, etc.)
+      - name: timezone
+        description: IANA timezone identifier
+      - name: region_type
+        description: Type of region (ISO/RTO, Utility, Grid Zone)
+      - name: avg_carbon_intensity
+        description: Historical average carbon intensity
+      - name: cleanliness_category
+        description: Category based on average intensity (Very Clean to Very Dirty)
+      - name: pue
+        description: Power Usage Effectiveness (future GSF RTC integration)
+      - name: wue
+        description: Water Usage Effectiveness (future GSF RTC integration)
+      - name: cfe_percent
+        description: Carbon-free energy percentage (future GSF RTC integration)
