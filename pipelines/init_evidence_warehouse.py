@@ -282,13 +282,76 @@ zones = [
     # Africa
     'ZA',            # South Africa (GCP africa-south1, AWS af-south-1, Azure South Africa North)
 ]
-for i in range(7 * 24):
+
+# Regional carbon intensity profiles (realistic baseline intensities based on grid mix)
+regional_profiles = {
+    # Low carbon regions (hydro/nuclear/renewables)
+    'CA-QC': (20, 50, 5, 95),      # Quebec - hydro dominant
+    'CA-ON': (80, 150, 40, 70),    # Ontario - nuclear + hydro
+    'NO': (15, 40, 2, 98),         # Norway - hydro
+    'SE': (30, 70, 5, 95),         # Sweden - hydro + nuclear
+    'FR': (50, 100, 10, 90),       # France - nuclear
+    'CH': (30, 80, 10, 90),        # Switzerland - hydro + nuclear
+    'BR-SP': (80, 150, 30, 75),    # Brazil - hydro dominant
+
+    # Medium carbon regions (mixed)
+    'US-CA-CISO': (200, 350, 40, 55),  # California - mixed with renewables
+    'US-OR': (150, 280, 35, 65),       # Oregon - hydro + gas
+    'GB': (180, 320, 35, 60),          # UK - gas + renewables
+    'DE': (300, 450, 45, 55),          # Germany - transitioning
+    'ES': (180, 320, 35, 60),          # Spain - renewables growing
+    'IT': (250, 400, 45, 50),          # Italy - gas heavy
+
+    # High carbon regions (coal/gas heavy)
+    'US-VA-PJM': (300, 500, 55, 40),   # Virginia - coal + gas
+    'US-OH': (350, 550, 60, 35),       # Ohio - coal heavy
+    'US-TX-ERCOT': (320, 520, 58, 40), # Texas - gas heavy
+    'US-IA-MISO': (350, 550, 60, 35),  # Iowa - coal heavy
+    'AU-NSW': (600, 800, 75, 25),      # Australia NSW - coal heavy
+    'AU-VIC': (550, 750, 70, 28),      # Australia VIC - coal
+    'PL': (600, 800, 80, 20),          # Poland - coal dominant
+    'ZA': (700, 900, 85, 15),          # South Africa - coal heavy
+    'IN-MH': (600, 850, 75, 25),       # India - coal heavy
+    'IN-TG': (600, 850, 75, 25),       # India - coal heavy
+    'IN-DL': (550, 800, 70, 28),       # India - mixed
+    'CN': (500, 700, 65, 30),          # China - coal heavy
+}
+
+# Generate 30 days of grid data (increased from 7 days for better trends)
+for i in range(30 * 24):
     timestamp = datetime.now() - timedelta(hours=i)
+    hour_of_day = timestamp.hour
+
+    # Peak hours have higher intensity (more fossil fuels used)
+    peak_multiplier = 1.2 if 9 <= hour_of_day <= 20 else 0.9
 
     for zone in zones:
-        intensity = random.uniform(200, 600)
-        fossil = random.uniform(30, 70)
-        renewable = random.uniform(20, 50)
+        # Get regional profile or use default
+        if zone in regional_profiles:
+            base_min, base_max, base_fossil, base_renewable = regional_profiles[zone]
+        else:
+            # Default medium carbon profile
+            base_min, base_max, base_fossil, base_renewable = (250, 450, 50, 45)
+
+        # Add time-of-day variation
+        intensity = random.uniform(base_min, base_max) * peak_multiplier
+
+        # Fossil/renewable varies inversely with time of day (less fossil at night in some regions)
+        fossil_variation = 5 * (peak_multiplier - 1)
+        fossil = min(95, max(5, base_fossil + fossil_variation + random.uniform(-5, 5)))
+        renewable = min(95, max(5, base_renewable - fossil_variation + random.uniform(-5, 5)))
+
+        # Categorize intensity
+        if intensity < 100:
+            category = 'Very Low'
+        elif intensity < 300:
+            category = 'Low'
+        elif intensity < 500:
+            category = 'Medium'
+        elif intensity < 700:
+            category = 'High'
+        else:
+            category = 'Very High'
 
         conn.execute("""
             INSERT INTO fact_grid_intensity VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -300,9 +363,64 @@ for i in range(7 * 24):
             intensity / 1000,
             fossil,
             renewable,
-            'Medium' if intensity < 400 else 'High',
-            'Electricity Maps'
+            category,
+            'Electricity Maps' if random.random() > 0.3 else 'WattTime'
         ])
+
+# Create aggregated tables for daily, weekly, monthly trends
+print("  - grid_intensity_daily")
+conn.execute("DROP TABLE IF EXISTS grid_intensity_daily")
+conn.execute("""
+    CREATE TABLE grid_intensity_daily AS
+    SELECT
+        grid_region,
+        timestamp_day as date,
+        AVG(carbon_intensity_gco2eq_per_kwh) as avg_intensity,
+        MIN(carbon_intensity_gco2eq_per_kwh) as min_intensity,
+        MAX(carbon_intensity_gco2eq_per_kwh) as max_intensity,
+        AVG(fossil_fuel_percentage) as avg_fossil_percentage,
+        AVG(renewable_percentage) as avg_renewable_percentage,
+        COUNT(*) as readings_count
+    FROM fact_grid_intensity
+    GROUP BY grid_region, timestamp_day
+    ORDER BY grid_region, timestamp_day
+""")
+
+print("  - grid_intensity_weekly")
+conn.execute("DROP TABLE IF EXISTS grid_intensity_weekly")
+conn.execute("""
+    CREATE TABLE grid_intensity_weekly AS
+    SELECT
+        grid_region,
+        DATE_TRUNC('week', timestamp_day) as week_start,
+        AVG(carbon_intensity_gco2eq_per_kwh) as avg_intensity,
+        MIN(carbon_intensity_gco2eq_per_kwh) as min_intensity,
+        MAX(carbon_intensity_gco2eq_per_kwh) as max_intensity,
+        AVG(fossil_fuel_percentage) as avg_fossil_percentage,
+        AVG(renewable_percentage) as avg_renewable_percentage,
+        COUNT(*) as readings_count
+    FROM fact_grid_intensity
+    GROUP BY grid_region, DATE_TRUNC('week', timestamp_day)
+    ORDER BY grid_region, week_start
+""")
+
+print("  - grid_intensity_monthly")
+conn.execute("DROP TABLE IF EXISTS grid_intensity_monthly")
+conn.execute("""
+    CREATE TABLE grid_intensity_monthly AS
+    SELECT
+        grid_region,
+        DATE_TRUNC('month', timestamp_day) as month_start,
+        AVG(carbon_intensity_gco2eq_per_kwh) as avg_intensity,
+        MIN(carbon_intensity_gco2eq_per_kwh) as min_intensity,
+        MAX(carbon_intensity_gco2eq_per_kwh) as max_intensity,
+        AVG(fossil_fuel_percentage) as avg_fossil_percentage,
+        AVG(renewable_percentage) as avg_renewable_percentage,
+        COUNT(*) as readings_count
+    FROM fact_grid_intensity
+    GROUP BY grid_region, DATE_TRUNC('month', timestamp_day)
+    ORDER BY grid_region, month_start
+""")
 
 # carbon_trends_monthly
 print("  - carbon_trends_monthly")
@@ -355,7 +473,16 @@ count = conn.execute('SELECT COUNT(*) FROM fact_cloud_carbon').fetchone()[0]
 print(f"\n✓ Created {count} cloud carbon records")
 
 count = conn.execute('SELECT COUNT(*) FROM fact_grid_intensity').fetchone()[0]
-print(f"✓ Created {count} grid intensity records")
+print(f"✓ Created {count} hourly grid intensity records (30 days)")
+
+count = conn.execute('SELECT COUNT(*) FROM grid_intensity_daily').fetchone()[0]
+print(f"✓ Created {count} daily aggregations")
+
+count = conn.execute('SELECT COUNT(*) FROM grid_intensity_weekly').fetchone()[0]
+print(f"✓ Created {count} weekly aggregations")
+
+count = conn.execute('SELECT COUNT(*) FROM grid_intensity_monthly').fetchone()[0]
+print(f"✓ Created {count} monthly aggregations")
 
 count = conn.execute('SELECT COUNT(*) FROM carbon_trends_monthly').fetchone()[0]
 print(f"✓ Created {count} trend records")
