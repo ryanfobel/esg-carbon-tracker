@@ -17,8 +17,8 @@ REQUIRED_TABLES = {
         'cloud_provider', 'usage_month_start', 'total_mtco2e', 'region'
     ],
     'grid_intensity_daily': [
-        'grid_region', 'timestamp_day', 'avg_carbon_intensity',
-        'min_carbon_intensity', 'max_carbon_intensity'
+        'grid_region', 'date', 'avg_intensity',
+        'min_intensity', 'max_intensity', 'avg_fossil_percentage', 'avg_renewable_percentage'
     ],
     'dim_grid_regions': [
         'grid_region', 'region_name', 'country', 'latitude', 'longitude'
