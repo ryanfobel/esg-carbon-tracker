@@ -38,16 +38,14 @@ SELECT
     r.aws_regions,
     r.azure_regions,
     r.latitude,
-    r.longitude,
-    r.avg_carbon_intensity,
-    r.cleanliness_category
+    r.longitude
 FROM esg_data.dim_grid_regions r
 WHERE r.cloud_providers IS NOT NULL
-ORDER BY r.avg_carbon_intensity ASC
+ORDER BY r.grid_region
 ```
 
 ```sql datacenter_with_grid
--- Join cloud emissions with grid region data
+-- Join cloud emissions with grid region data and calculate average grid intensity
 WITH cloud_regions AS (
     SELECT
         cloud_provider,
@@ -57,24 +55,39 @@ WITH cloud_regions AS (
     WHERE region IS NOT NULL
     GROUP BY cloud_provider, region
 ),
-grid_mappings AS (
+grid_intensity_avg AS (
     SELECT
         grid_region,
-        region_name,
-        country,
-        avg_carbon_intensity,
-        cleanliness_category,
+        AVG(avg_intensity) as avg_carbon_intensity,
         CASE
-            WHEN cloud_provider = 'GCP' THEN TRIM(UNNEST(string_split(gcp_regions, ',')))
-            WHEN cloud_provider = 'AWS' THEN TRIM(UNNEST(string_split(aws_regions, ',')))
-            WHEN cloud_provider = 'Azure' THEN TRIM(UNNEST(string_split(azure_regions, ',')))
+            WHEN AVG(avg_intensity) < 100 THEN 'Very Low'
+            WHEN AVG(avg_intensity) < 250 THEN 'Low'
+            WHEN AVG(avg_intensity) < 400 THEN 'Medium'
+            WHEN AVG(avg_intensity) < 600 THEN 'High'
+            ELSE 'Very High'
+        END as cleanliness_category
+    FROM esg_data.grid_intensity_daily
+    GROUP BY grid_region
+),
+grid_mappings AS (
+    SELECT
+        r.grid_region,
+        r.region_name,
+        r.country,
+        gi.avg_carbon_intensity,
+        gi.cleanliness_category,
+        CASE
+            WHEN cloud_provider = 'GCP' THEN TRIM(UNNEST(string_split(r.gcp_regions, ',')))
+            WHEN cloud_provider = 'AWS' THEN TRIM(UNNEST(string_split(r.aws_regions, ',')))
+            WHEN cloud_provider = 'Azure' THEN TRIM(UNNEST(string_split(r.azure_regions, ',')))
         END as datacenter_region,
         cloud_provider,
-        latitude,
-        longitude
-    FROM esg_data.dim_grid_regions,
-         (VALUES ('GCP'), ('AWS'), ('Azure')) AS providers(cloud_provider)
-    WHERE cloud_providers LIKE '%' || cloud_provider || '%'
+        r.latitude,
+        r.longitude
+    FROM esg_data.dim_grid_regions r
+    LEFT JOIN grid_intensity_avg gi ON r.grid_region = gi.grid_region
+    CROSS JOIN (VALUES ('GCP'), ('AWS'), ('Azure')) AS providers(cloud_provider)
+    WHERE r.cloud_providers LIKE '%' || cloud_provider || '%'
 )
 SELECT
     gm.cloud_provider,
